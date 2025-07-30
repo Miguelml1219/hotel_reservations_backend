@@ -1,8 +1,7 @@
-package com.hotel.reservations;
+package com.hotel.reservations.service;
 
 import com.hotel.reservations.model.Room;
 import com.hotel.reservations.repository.RoomRepository;
-import com.hotel.reservations.service.RoomService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
