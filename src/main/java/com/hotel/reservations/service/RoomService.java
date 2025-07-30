@@ -1,5 +1,7 @@
 package com.hotel.reservations.service;
 
+import com.hotel.reservations.exception.EntityNotFoundException;
+import com.hotel.reservations.exception.MaxMaximumRoomsByFloorException;
 import com.hotel.reservations.model.Reservation;
 import com.hotel.reservations.model.Room;
 import com.hotel.reservations.repository.ReservationRepository;
@@ -43,7 +45,7 @@ public class RoomService {
 
         if(roomsInFloor >= 10){
             log.error("Error: there are already 10 rooms on the floor {}", room.getFloor());
-            throw new IllegalArgumentException("No more than 10 rooms can be registered per floor");
+            throw new MaxMaximumRoomsByFloorException("No more than 10 rooms can be registered per floor");
         }
 
         String numFormated = String.format("%02d", room.getNumber());
@@ -111,7 +113,7 @@ public class RoomService {
 
         }).orElseThrow(()->{
             log.warn("No room found with ID: {}", id);
-            return new IllegalArgumentException("Room not found with ID: "+id);
+            return new EntityNotFoundException("Room not found with ID: "+id);
         });
     }
 

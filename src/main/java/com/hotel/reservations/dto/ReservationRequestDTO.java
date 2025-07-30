@@ -15,6 +15,7 @@ public class ReservationRequestDTO {
     private String identification;
 
     @NotBlank(message = "The document type is mandatory")
+    @Pattern(regexp = "^(CC|TI|CE|PASSPORT)$", message = "Invalid document type")
     private String documentType;
 
     @NotNull(message = "The date of entry is mandatory")

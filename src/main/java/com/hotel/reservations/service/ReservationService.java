@@ -1,6 +1,8 @@
 package com.hotel.reservations.service;
 
 import com.hotel.reservations.dto.ReservationRequestDTO;
+import com.hotel.reservations.exception.InvalidDateFormatException;
+import com.hotel.reservations.exception.RoomNotAvailableException;
 import com.hotel.reservations.model.Reservation;
 import com.hotel.reservations.model.Room;
 import com.hotel.reservations.repository.ReservationRepository;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Slf4j
@@ -45,7 +48,7 @@ public class ReservationService {
             log.warn("Room {} not available between {} and {}", reservation.getRoom().getId(),
                     reservation.getDateEntry(), reservation.getDepartureDate());
 
-            throw new IllegalArgumentException("The room is not available in that date range.");
+            throw new RoomNotAvailableException("The room is not available in that date range.");
         }
 
         reservation.setRoom(room);
@@ -67,12 +70,22 @@ public class ReservationService {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
+        LocalDateTime dateEntry;
+        LocalDateTime departureDate;
+
+        try {
+            dateEntry = LocalDateTime.parse(dto.getDateEntry(), formatter);
+            departureDate = LocalDateTime.parse(dto.getDepartureDate(), formatter);
+        } catch (DateTimeParseException e) {
+            throw new InvalidDateFormatException("Invalid date format. Use dd/MM/yyyy HH:mm:ss");
+        }
+
         Reservation reservation = Reservation.builder()
                 .name(dto.getName())
                 .identification(dto.getIdentification())
                 .documentType(dto.getDocumentType())
-                .dateEntry(LocalDateTime.parse(dto.getDateEntry(), formatter))
-                .departureDate(LocalDateTime.parse(dto.getDepartureDate(), formatter))
+                .dateEntry(dateEntry)
+                .departureDate(departureDate)
                 .room(room)
                 .build();
 
