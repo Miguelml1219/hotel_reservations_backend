@@ -78,4 +78,9 @@ public class ReservationService {
 
         return createReservation(reservation);
     }
+
+    public List<Room> obtainBusyRooms(LocalDateTime entry, LocalDateTime exit){
+        log.info("Querying occupied rooms between {} and {}", entry, exit);
+        return reservationRepository.findRoomsOccupiedInRange(entry, exit);
+    }
 }

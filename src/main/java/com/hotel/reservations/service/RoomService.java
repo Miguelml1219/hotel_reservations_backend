@@ -1,10 +1,13 @@
 package com.hotel.reservations.service;
 
+import com.hotel.reservations.model.Reservation;
 import com.hotel.reservations.model.Room;
+import com.hotel.reservations.repository.ReservationRepository;
 import com.hotel.reservations.repository.RoomRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,9 +16,11 @@ import java.util.Optional;
 public class RoomService {
 
     private RoomRepository roomRepository;
+    private ReservationRepository reservationRepository;
 
-    public RoomService(RoomRepository roomRepository) {
+    public RoomService(RoomRepository roomRepository, ReservationRepository reservationRepository) {
         this.roomRepository = roomRepository;
+        this.reservationRepository = reservationRepository;
     }
 
     public Room registerRoom(Room room){
@@ -125,5 +130,22 @@ public class RoomService {
     }
 
 
+    public List<Room> filterByAvailablesByDate(String type, int minimumCapacity,
+                                               LocalDateTime entry, LocalDateTime exit) {
+        log.info("Filtering available rooms - Type: {}, Minimum capacity: {}, Dates: {} - {}",
+                type, minimumCapacity, entry, exit);
 
+        List<Room> availables = roomRepository.
+                findByTypeAndCapacityGreaterThanEqualAndAvailableTrue(type, minimumCapacity);
+
+        return availables.stream()
+                .filter(r -> {
+                   List<Reservation> overlappingBookings = reservationRepository
+                           .findByRoomIdAndDepartureDateAfterAndDateEntryBefore(
+                                   r.getId(),entry,exit);
+                   return overlappingBookings.isEmpty();
+                })
+                .toList();
+
+    }
 }

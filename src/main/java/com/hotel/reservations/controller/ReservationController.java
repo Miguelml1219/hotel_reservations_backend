@@ -2,11 +2,14 @@ package com.hotel.reservations.controller;
 
 import com.hotel.reservations.dto.ReservationRequestDTO;
 import com.hotel.reservations.model.Reservation;
+import com.hotel.reservations.model.Room;
 import com.hotel.reservations.service.ReservationService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -29,4 +32,22 @@ public class ReservationController {
         Reservation reservation = reservationService.mapAndCreateReservation(dto);
         return ResponseEntity.ok(reservation);
     }
+
+
+    @GetMapping("/busy")
+    public ResponseEntity<List<Room>> obtainBusyRooms(
+            @RequestParam String dateEntry,
+            @RequestParam String departureDate){
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+        LocalDateTime entry = LocalDateTime.parse(dateEntry,formatter);
+        LocalDateTime exit = LocalDateTime.parse(departureDate, formatter);
+
+        List<Room> busy = reservationService.obtainBusyRooms(entry, exit);
+
+        return ResponseEntity.ok(busy);
+
+    }
+
 }
