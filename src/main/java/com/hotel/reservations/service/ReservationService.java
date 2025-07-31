@@ -2,6 +2,7 @@ package com.hotel.reservations.service;
 
 import com.hotel.reservations.dto.ReservationRequestDTO;
 import com.hotel.reservations.exception.InvalidDateFormatException;
+import com.hotel.reservations.exception.ReservationInvalidException;
 import com.hotel.reservations.exception.RoomNotAvailableException;
 import com.hotel.reservations.model.Reservation;
 import com.hotel.reservations.model.Room;
@@ -32,7 +33,7 @@ public class ReservationService {
     public Reservation createReservation(Reservation reservation) {
 
         Room room = roomRepository.findById(reservation.getRoom().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Room not found"));
+                .orElseThrow(() -> new ReservationInvalidException("Room not found"));
         log.error("Room with ID {} not found", reservation.getRoom().getId());
 
         log.info("Starting reservation creation for {} ({})", reservation.getName(), reservation.getIdentification());

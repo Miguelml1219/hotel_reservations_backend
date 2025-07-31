@@ -1,6 +1,7 @@
 package com.hotel.reservations.service;
 
 import com.hotel.reservations.exception.EntityNotFoundException;
+import com.hotel.reservations.exception.InvalidDataException;
 import com.hotel.reservations.exception.MaxMaximumRoomsByFloorException;
 import com.hotel.reservations.model.Reservation;
 import com.hotel.reservations.model.Room;
@@ -28,15 +29,15 @@ public class RoomService {
     public Room registerRoom(Room room){
 
         if(room.getNumber() < 1 || room.getNumber() > 99){
-            throw new IllegalArgumentException("The room number must be between 1 and 99.");
+            throw new InvalidDataException("The room number must be between 1 and 99.");
         }
 
         if(room.getValuePerNight() == null || room.getValuePerNight() <=0){
-            throw new IllegalArgumentException("The value per night must be greater than 0.");
+            throw new InvalidDataException("The value per night must be greater than 0.");
         }
 
         if(room.getCapacity() == null || room.getCapacity() <=0){
-            throw new IllegalArgumentException("The capacity must be greater than 0.");
+            throw new InvalidDataException("The capacity must be greater than 0.");
         }
 
         long roomsInFloor = roomRepository.findAll().stream()

@@ -3,6 +3,7 @@ package com.hotel.reservations.controller;
 import com.hotel.reservations.dto.ReservationRequestDTO;
 import com.hotel.reservations.model.Reservation;
 import com.hotel.reservations.model.Room;
+import com.hotel.reservations.response.ApiResponse;
 import com.hotel.reservations.service.ReservationService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +29,14 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<Reservation> createReservation(@Valid @RequestBody ReservationRequestDTO dto){
+    public ResponseEntity<ApiResponse<Reservation>> createReservation(@Valid @RequestBody ReservationRequestDTO dto){
         Reservation reservation = reservationService.mapAndCreateReservation(dto);
-        return ResponseEntity.ok(reservation);
+        ApiResponse<Reservation> response = new ApiResponse<>(
+                reservation,
+                "SUCCESS",
+                "Reservation created successfully."
+        );
+        return ResponseEntity.ok(response);
     }
 
 
