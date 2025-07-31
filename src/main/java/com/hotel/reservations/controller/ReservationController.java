@@ -6,6 +6,7 @@ import com.hotel.reservations.model.Room;
 import com.hotel.reservations.response.ApiResponse;
 import com.hotel.reservations.service.ReservationService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("api/hotel/reservation")
 public class ReservationController {
@@ -36,6 +38,7 @@ public class ReservationController {
                 "SUCCESS",
                 "Reservation created successfully."
         );
+        log.info("Reservation successfully registered. ID reservation: {}", reservation.getId());
         return ResponseEntity.ok(response);
     }
 

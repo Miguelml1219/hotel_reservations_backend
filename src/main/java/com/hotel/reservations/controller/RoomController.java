@@ -3,6 +3,7 @@ package com.hotel.reservations.controller;
 import com.hotel.reservations.service.ReservationService;
 import com.hotel.reservations.model.Room;
 import com.hotel.reservations.service.RoomService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("api/hotel/rooms")
 public class RoomController {
@@ -22,8 +24,11 @@ public class RoomController {
 
     @PostMapping
     public ResponseEntity<Room> createRoom(@RequestBody Room room){
+        log.info("Creating Room...");
         Room newRoom = roomService.registerRoom(room);
+        log.info("Room successfully registered with ID: {}", room.getId());
         return ResponseEntity.ok(newRoom);
+
     }
 
     @GetMapping
