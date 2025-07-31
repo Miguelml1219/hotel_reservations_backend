@@ -1,6 +1,7 @@
 package com.hotel.reservations.service;
 
 import com.hotel.reservations.dto.ReservationRequestDTO;
+import com.hotel.reservations.exception.InvalidDataException;
 import com.hotel.reservations.exception.InvalidDateFormatException;
 import com.hotel.reservations.exception.ReservationInvalidException;
 import com.hotel.reservations.exception.RoomNotAvailableException;
@@ -34,9 +35,23 @@ public class ReservationService {
 
         Room room = roomRepository.findById(reservation.getRoom().getId())
                 .orElseThrow(() -> new ReservationInvalidException("Room not found"));
-        log.error("Room with ID {} not found", reservation.getRoom().getId());
+
+
+        if (!reservation.getName().matches("^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]{2,40}$")) {
+            throw new InvalidDataException("Guest name contains invalid characters.");
+        }
+
+
+        if (reservation.getDepartureDate().isBefore(reservation.getDateEntry())) {
+
+            log.error("Invalid reservation: departure date {} is before entry date {}",
+                    reservation.getDepartureDate(), reservation.getDateEntry());
+
+            throw new ReservationInvalidException("Departure date cannot be before entry date.");
+        }
 
         log.info("Starting reservation creation for {} ({})", reservation.getName(), reservation.getIdentification());
+
         List<Reservation> overlappingBookings = reservationRepository
                 .findByRoomIdAndDepartureDateAfterAndDateEntryBefore(
                         room.getId(),

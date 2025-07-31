@@ -1,5 +1,6 @@
 package com.hotel.reservations.service;
 
+import com.hotel.reservations.exception.MaxMaximumRoomsByFloorException;
 import com.hotel.reservations.model.Reservation;
 import com.hotel.reservations.model.Room;
 import com.hotel.reservations.repository.ReservationRepository;
@@ -72,7 +73,7 @@ public class RoomServiceTest {
                 .valuePerNight(25.0)
                 .build();
 
-        assertThrows(IllegalArgumentException.class,() -> roomService.registerRoom(newRoom));
+        assertThrows(MaxMaximumRoomsByFloorException.class,() -> roomService.registerRoom(newRoom));
 
     }
 
@@ -121,5 +122,23 @@ public class RoomServiceTest {
         assertEquals("101", result.get(0).getId());
 
     }
+
+    @Test
+    void mustGenerateIdForNewRoom() {
+        Room room = new Room();
+        room.setNumber(20);
+        room.setFloor(2);
+        room.setCapacity(3);
+        room.setType("suite");
+        room.setValuePerNight(80.0);
+
+        when(roomRepository.countByFloor(2)).thenReturn(0L);
+        when(roomRepository.save(any(Room.class))).thenAnswer(i -> i.getArgument(0));
+
+        Room result = roomService.registerRoom(room);
+
+        assertNotNull(result.getId());
+    }
+
 
 }

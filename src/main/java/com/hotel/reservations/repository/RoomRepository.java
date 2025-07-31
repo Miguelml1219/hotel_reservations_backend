@@ -8,5 +8,6 @@ public interface RoomRepository extends JpaRepository <Room, String> {
 
     List<Room> findByAvailableTrue();
     List<Room> findByTypeAndCapacityGreaterThanEqualAndAvailableTrue(String type, int capacity);
+    long countByFloor(Integer floor);
 
 }

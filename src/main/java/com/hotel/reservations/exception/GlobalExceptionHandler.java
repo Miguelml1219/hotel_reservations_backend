@@ -11,6 +11,12 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(RoomNotAvailableException.class)
+    public ResponseEntity<ApiResponse<?>> handleRoomNotAvailable(RoomNotAvailableException ex) {
+        ApiResponse<?> response = new ApiResponse<>(null, "ERROR", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<?>> handleRuntime(RuntimeException ex) {
         ApiResponse<?> response = new ApiResponse<>(null, "ERROR", ex.getMessage());

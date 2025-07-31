@@ -1,5 +1,8 @@
 package com.hotel.reservations.service;
 
+import com.hotel.reservations.exception.InvalidDataException;
+import com.hotel.reservations.exception.ReservationInvalidException;
+import com.hotel.reservations.exception.RoomNotAvailableException;
 import com.hotel.reservations.model.Reservation;
 import com.hotel.reservations.model.Room;
 import com.hotel.reservations.repository.ReservationRepository;
@@ -7,6 +10,7 @@ import com.hotel.reservations.repository.RoomRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.boot.web.reactive.context.ReactiveWebServerApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -88,7 +92,46 @@ public class ReservationServiceTest {
         when(reservationRepository.findByRoomIdAndDepartureDateAfterAndDateEntryBefore
                 (eq("101"), any(), any())).thenReturn(List.of(existingReserve));
 
-        assertThrows(IllegalArgumentException.class, () -> reservationService.createReservation(newReservation));
+        assertThrows(RoomNotAvailableException.class, () -> reservationService.createReservation(newReservation));
+    }
+
+    @Test
+    void shouldThrowExceptionIfDepartureDateBeforeEntryDate(){
+        Room room = new Room();
+        room.setId("201");
+
+        Reservation invalidReservation = Reservation.builder()
+                .name("Miguel")
+                .identification("1117350206")
+                .documentType("CC")
+                .dateEntry(LocalDateTime.now().plusDays(3))
+                .departureDate(LocalDateTime.now().plusDays(1))
+                .room(room)
+                .build();
+
+        when(roomRepository.findById("201")).thenReturn(Optional.of(room));
+
+        assertThrows(ReservationInvalidException.class,()
+                -> reservationService.createReservation(invalidReservation));
+
+    }
+
+    @Test
+    void shouldThrowExceptionIfGuestNameIsInvalid(){
+        Room room = new Room();
+        room.setId("101");
+
+        Reservation invalidReservation = Reservation.builder()
+                .name("Miguel#12@")
+                .identification("1117350206")
+                .documentType("CC")
+                .dateEntry(LocalDateTime.now().plusDays(1))
+                .departureDate(LocalDateTime.now().plusDays(3))
+                .room(room)
+                .build();
+        when(roomRepository.findById("101")).thenReturn(Optional.of(room));
+        assertThrows(InvalidDataException.class,()
+                -> reservationService.createReservation(invalidReservation));
     }
 
 
